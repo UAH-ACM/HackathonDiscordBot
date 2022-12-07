@@ -1,5 +1,6 @@
 mod commands;
 
+use dotenv::dotenv;
 use serenity::async_trait;
 use serenity::model::application::interaction::{Interaction, InteractionResponseType};
 use serenity::model::gateway::Ready;
@@ -51,10 +52,12 @@ impl EventHandler for Handler {
 #[tokio::main]
 async fn main() {
     // Configure the client with your Discord bot token in the environment.
-    
+    dotenv().ok();
+    let DISCORD_TOKEN = std::env::var("DISCORD_TOKEN").expect("DISCORD_TOKEN must be set.");
+
 
     // Build our client.
-    let mut client = Client::builder("MTA0OTU1MTg0Mzk2MjkyMDk4Mg.Gsa8V6.bLfBk1T8k9QFtZU4d6w_XcAmJYFMEs5IIwjWXw", GatewayIntents::empty())
+    let mut client = Client::builder(DISCORD_TOKEN, GatewayIntents::empty())
     .event_handler(Handler)
     .await
     .expect("Error creating client");
