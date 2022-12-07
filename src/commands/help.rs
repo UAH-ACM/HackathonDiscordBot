@@ -1,8 +1,8 @@
-use serenity::model::application::interaction::message_component::MessageComponentInteraction;
+use serenity::builder::CreateApplicationCommand;
 
-pub async fn help() -> String {
+pub fn help() -> String {
     let help_message = "I can help you explore and join groups.
-    Following is the list of available commands.
+    **The following is a list of available commands.**
     `!help`: Show this message.
     `!whoami`: See some info about you.
     `!checkin <description>`: Register as \"Team seeking\". Provide a description of yourself so others can read up on you!
@@ -15,7 +15,6 @@ pub async fn help() -> String {
     String::from(help_message)
 }
 
-pub async fn whoami(msg: MessageComponentInteraction) -> String {
-    let help_message = format!("Hi, you are {}#{}!", msg.user.name, msg.user.discriminator);
-    String::from(help_message)
+pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
+    command.name("help").description("Show the help message.")
 }
