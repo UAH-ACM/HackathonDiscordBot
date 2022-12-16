@@ -16,14 +16,15 @@ impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::ApplicationCommand(mut command) = interaction {
             let content = match command.data.name.as_str() {
-                "help" => commands::help::help(),
-                "whoami" => commands::whoami::whoami(&mut command),
-                "checkin" => commands::checkin::checkin(&mut command),
-                "get_table" => commands::get_table::get_table(&mut command),
-                "delete_table" => commands::delete::delete_table(&mut command),
-                "delete_row_by_id" => commands::delete::delete_record_by_id(&mut command),
-                "delete_row_by_username" => commands::delete::delete_record_by_username(&mut command),
-				"list_available_users" => commands::ls_avail::get_available_users(&mut command),
+                "help" => commands::users::help::help(),
+				"whoami" => commands::users::whoami::whoami(&mut command),
+				"checkin" => commands::users::checkin::checkin(&mut command),
+				"get_table" => commands::admin::get_table::get_table(&mut command),
+				"delete_table" => commands::admin::delete::delete_table(&mut command),
+				"delete_row_by_id" => commands::admin::delete::delete_record_by_id(&mut command),
+				"delete_row_by_username" => commands::admin::delete::delete_record_by_username(&mut command),
+				"list_available_users" => commands::users::ls_avail::get_available_users(&mut command),
+				"create_team" => commands::teams::create_team::create_team(&mut command),
                 _ => "not implemented :(".to_string(),
             };
 
@@ -72,21 +73,21 @@ impl EventHandler for Handler {
         let _commands =
             GuildId::set_application_commands(&main_discord_id, &ctx.http, |commands| {
                 commands
-                    .create_application_command(|command| commands::help::register(command))
-                    .create_application_command(|command| commands::whoami::register(command))
-                    .create_application_command(|command| commands::checkin::register(command))
-                    .create_application_command(|command| commands::get_table::register(command))
+                    .create_application_command(|command| commands::users::help::register(command))
+                    .create_application_command(|command| commands::users::whoami::register(command))
+                    .create_application_command(|command| commands::users::checkin::register(command))
+                    .create_application_command(|command| commands::admin::get_table::register(command))
                     .create_application_command(|command| {
-                        commands::delete::register_row_delete_id(command)
+                        commands::admin::delete::register_row_delete_id(command)
                     })
                     .create_application_command(|command| {
-                        commands::delete::register_row_delete_username(command)
+                        commands::admin::delete::register_row_delete_username(command)
                     })
                     .create_application_command(|command| {
-                        commands::delete::register_table_delete(command)
+                        commands::admin::delete::register_table_delete(command)
                     })
 					.create_application_command(|command| {
-                        commands::ls_avail::register(command)
+                        commands::users::ls_avail::register(command)
                     })
             })
             .await;

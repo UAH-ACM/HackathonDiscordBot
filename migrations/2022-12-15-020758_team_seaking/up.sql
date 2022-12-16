@@ -4,4 +4,4 @@ CREATE TABLE team_seaking (
   name VARCHAR NOT NULL,
   discordname TEXT NOT NULL,
   description TEXT NOT NULL
-)
+);

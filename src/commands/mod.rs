@@ -1,7 +1,4 @@
-pub mod help;
-pub mod whoami;
-pub mod checkin;
+pub mod teams;
+pub mod admin;
+pub mod users;
 pub mod pq;
-pub mod get_table;
-pub mod delete;
-pub mod ls_avail;

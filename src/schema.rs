@@ -8,3 +8,17 @@ diesel::table! {
         description -> Text,
     }
 }
+
+diesel::table! {
+    teams (id) {
+        id -> Int8,
+        name -> Varchar,
+        description -> Text,
+        points -> Int8,
+    }
+}
+
+diesel::allow_tables_to_appear_in_same_query!(
+    team_seaking,
+    teams,
+);
