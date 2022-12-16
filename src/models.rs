@@ -17,4 +17,7 @@ pub struct Teams {
     pub id: i64,
 	pub name: String,
 	pub description: String,
+	pub leader: String,
+	pub members: String,
+	pub points: i64,
 }

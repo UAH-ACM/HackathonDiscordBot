@@ -95,21 +95,21 @@ impl EventHandler for Handler {
         let _commands =
             GuildId::set_application_commands(&test_discord_id, &ctx.http, |commands| {
                 commands
-                    .create_application_command(|command| commands::help::register(command))
-                    .create_application_command(|command| commands::whoami::register(command))
-                    .create_application_command(|command| commands::checkin::register(command))
-                    .create_application_command(|command| commands::get_table::register(command))
+                    .create_application_command(|command| commands::users::help::register(command))
+                    .create_application_command(|command| commands::users::whoami::register(command))
+                    .create_application_command(|command| commands::users::checkin::register(command))
+                    .create_application_command(|command| commands::admin::get_table::register(command))
                     .create_application_command(|command| {
-                        commands::delete::register_row_delete_id(command)
+                        commands::admin::delete::register_row_delete_id(command)
                     })
                     .create_application_command(|command| {
-                        commands::delete::register_row_delete_username(command)
+                        commands::admin::delete::register_row_delete_username(command)
                     })
                     .create_application_command(|command| {
-                        commands::delete::register_table_delete(command)
+                        commands::admin::delete::register_table_delete(command)
                     })
 					.create_application_command(|command| {
-                        commands::ls_avail::register(command)
+                        commands::users::ls_avail::register(command)
                     })
             })
             .await;

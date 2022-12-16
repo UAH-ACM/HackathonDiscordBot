@@ -1,10 +1,10 @@
 use serenity::builder::CreateApplicationCommand;
 use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
 
-use super::super::schema::team_seaking::dsl::*;
-use super::super::models::*;
+use super::super::super::schema::team_seaking::dsl::*;
+use super::super::super::models::*;
 use diesel::prelude::*;
-use super::pq;
+use super::super::pq;
 
 pub fn get_available_users(_command_interaction: &mut ApplicationCommandInteraction) -> String {
     let connection = &mut pq::connect::establish_connection();

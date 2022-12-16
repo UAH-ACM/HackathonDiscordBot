@@ -14,6 +14,8 @@ diesel::table! {
         id -> Int8,
         name -> Varchar,
         description -> Text,
+        leader -> Text,
+        members -> Text,
         points -> Int8,
     }
 }
