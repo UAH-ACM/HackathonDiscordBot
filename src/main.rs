@@ -23,7 +23,8 @@ impl EventHandler for Handler {
                 "checkin" => commands::checkin::checkin(&mut command),
 				"get_table" => commands::get_table::get_table(&mut command),
 				"delete_table" => commands::delete::delete_table(&mut command),
-				"delete_row" => commands::delete::delete_record(&mut command),
+				"delete_row_by_id" => commands::delete::delete_record_by_id(&mut command),
+				"delete_row_by_username" => commands::delete::delete_record_by_username(&mut command),
                 _ => "not implemented :(".to_string(),
             };
 
@@ -54,7 +55,8 @@ impl EventHandler for Handler {
             .create_application_command(|command| commands::whoami::register(command))
             .create_application_command(|command| commands::checkin::register(command))
 			.create_application_command(|command| commands::get_table::register(command))
-			.create_application_command(|command| commands::delete::register_row_delete(command))
+			.create_application_command(|command| commands::delete::register_row_delete_id(command))
+			.create_application_command(|command| commands::delete::register_row_delete_username(command))
 			.create_application_command(|command| commands::delete::register_table_delete(command))
         }).await;
 
@@ -64,7 +66,8 @@ impl EventHandler for Handler {
             .create_application_command(|command| commands::whoami::register(command))
             .create_application_command(|command| commands::checkin::register(command))
 			.create_application_command(|command| commands::get_table::register(command))
-			.create_application_command(|command| commands::delete::register_row_delete(command))
+			.create_application_command(|command| commands::delete::register_row_delete_id(command))
+			.create_application_command(|command| commands::delete::register_row_delete_username(command))
 			.create_application_command(|command| commands::delete::register_table_delete(command))
         }).await;
     }

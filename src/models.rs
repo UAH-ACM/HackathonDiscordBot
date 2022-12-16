@@ -1,7 +1,7 @@
 use crate::schema::team_seaking;
 use diesel::prelude::*;
 
-#[derive(Identifiable, Queryable, Insertable, Debug)]
+#[derive(Identifiable, Queryable, Insertable, Eq, PartialEq, Debug)]
 #[diesel(table_name = team_seaking)]
 pub struct TeamSeaking {
     pub id: i64,
