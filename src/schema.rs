@@ -12,7 +12,7 @@ diesel::table! {
 diesel::table! {
     teams (id) {
         id -> Int8,
-        name -> Varchar,
+        team_name -> Varchar,
         description -> Text,
         leader -> Text,
         members -> Text,
@@ -20,7 +20,4 @@ diesel::table! {
     }
 }
 
-diesel::allow_tables_to_appear_in_same_query!(
-    team_seaking,
-    teams,
-);
+diesel::allow_tables_to_appear_in_same_query!(team_seaking, teams,);

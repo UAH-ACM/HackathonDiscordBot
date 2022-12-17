@@ -17,14 +17,21 @@ impl EventHandler for Handler {
         if let Interaction::ApplicationCommand(mut command) = interaction {
             let content = match command.data.name.as_str() {
                 "help" => commands::users::help::help(),
-				"whoami" => commands::users::whoami::whoami(&mut command),
-				"checkin" => commands::users::checkin::checkin(&mut command),
-				"get_table" => commands::admin::get_table::get_table(&mut command),
-				"delete_table" => commands::admin::delete::delete_table(&mut command),
-				"delete_row_by_id" => commands::admin::delete::delete_record_by_id(&mut command),
-				"delete_row_by_username" => commands::admin::delete::delete_record_by_username(&mut command),
-				"list_available_users" => commands::users::ls_avail::get_available_users(&mut command),
-				"create_team" => commands::teams::create_team::create_team(&mut command),
+                "whoami" => commands::users::whoami::whoami(&mut command),
+                "checkin" => commands::users::checkin::checkin(&mut command),
+                "get_table" => commands::admin::get_table::get_table(&mut command),
+                "delete_table" => commands::admin::delete::delete_table(&mut command),
+                "delete_row_by_id" => commands::admin::delete::delete_record_by_id(&mut command),
+                "delete_row_by_username" => {
+                    commands::admin::delete::delete_record_by_username(&mut command)
+                }
+                "list_available_users" => {
+                    commands::users::ls_avail::get_available_users(&mut command)
+                }
+                "create_team" => commands::teams::create_team::create_team(&mut command),
+                "list_available_teams" => {
+                    commands::teams::get_avail_teams::get_available_teams(&mut command)
+                }
                 _ => "not implemented :(".to_string(),
             };
 
@@ -38,13 +45,15 @@ impl EventHandler for Handler {
                     .create_interaction_response(&ctx.http, |response| {
                         response
                             .kind(InteractionResponseType::ChannelMessageWithSource)
-                            .interaction_response_data(|message| message.add_file("./tmp/message.txt"))
+                            .interaction_response_data(|message| {
+                                message.add_file("./tmp/message.txt")
+                            })
                     })
                     .await
                 {
                     println!("Cannot respond to slash command: {}", why);
                 }
-				let _ = fs::remove_file("./tmp/message.txt");
+                let _ = fs::remove_file("./tmp/message.txt");
             } else {
                 if let Err(why) = command
                     .create_interaction_response(&ctx.http, |response| {
@@ -74,9 +83,15 @@ impl EventHandler for Handler {
             GuildId::set_application_commands(&main_discord_id, &ctx.http, |commands| {
                 commands
                     .create_application_command(|command| commands::users::help::register(command))
-                    .create_application_command(|command| commands::users::whoami::register(command))
-                    .create_application_command(|command| commands::users::checkin::register(command))
-                    .create_application_command(|command| commands::admin::get_table::register(command))
+                    .create_application_command(|command| {
+                        commands::users::whoami::register(command)
+                    })
+                    .create_application_command(|command| {
+                        commands::users::checkin::register(command)
+                    })
+                    .create_application_command(|command| {
+                        commands::admin::get_table::register(command)
+                    })
                     .create_application_command(|command| {
                         commands::admin::delete::register_row_delete_id(command)
                     })
@@ -86,8 +101,14 @@ impl EventHandler for Handler {
                     .create_application_command(|command| {
                         commands::admin::delete::register_table_delete(command)
                     })
-					.create_application_command(|command| {
+                    .create_application_command(|command| {
                         commands::users::ls_avail::register(command)
+                    })
+                    .create_application_command(|command| {
+                        commands::teams::create_team::register(command)
+                    })
+                    .create_application_command(|command| {
+                        commands::teams::get_avail_teams::register(command)
                     })
             })
             .await;
@@ -96,9 +117,15 @@ impl EventHandler for Handler {
             GuildId::set_application_commands(&test_discord_id, &ctx.http, |commands| {
                 commands
                     .create_application_command(|command| commands::users::help::register(command))
-                    .create_application_command(|command| commands::users::whoami::register(command))
-                    .create_application_command(|command| commands::users::checkin::register(command))
-                    .create_application_command(|command| commands::admin::get_table::register(command))
+                    .create_application_command(|command| {
+                        commands::users::whoami::register(command)
+                    })
+                    .create_application_command(|command| {
+                        commands::users::checkin::register(command)
+                    })
+                    .create_application_command(|command| {
+                        commands::admin::get_table::register(command)
+                    })
                     .create_application_command(|command| {
                         commands::admin::delete::register_row_delete_id(command)
                     })
@@ -108,8 +135,14 @@ impl EventHandler for Handler {
                     .create_application_command(|command| {
                         commands::admin::delete::register_table_delete(command)
                     })
-					.create_application_command(|command| {
+                    .create_application_command(|command| {
                         commands::users::ls_avail::register(command)
+                    })
+                    .create_application_command(|command| {
+                        commands::teams::create_team::register(command)
+                    })
+                    .create_application_command(|command| {
+                        commands::teams::get_avail_teams::register(command)
                     })
             })
             .await;

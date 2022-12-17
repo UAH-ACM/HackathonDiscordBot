@@ -4,7 +4,9 @@ use serenity::model::prelude::command::CommandOptionType;
 use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
 use serenity::model::prelude::interaction::application_command::CommandDataOptionValue;
 
-pub fn delete_record_by_username(command_interaction: &mut ApplicationCommandInteraction) -> String {
+pub fn delete_record_by_username(
+    command_interaction: &mut ApplicationCommandInteraction,
+) -> String {
     let conn = &mut pq::connect::establish_connection();
 
     let options = &command_interaction.data.options;
@@ -24,7 +26,7 @@ pub fn delete_record_by_username(command_interaction: &mut ApplicationCommandInt
         return format!("{:?} is not a valid id", name_option);
     }
 
-    let num_deleted = pq::interface::delete_row(conn, search);
+    let num_deleted = pq::interface::user_delete_row(conn, search);
 
     format!("Deleted {} row(s)", num_deleted)
 }
@@ -41,24 +43,65 @@ pub fn delete_record_by_id(command_interaction: &mut ApplicationCommandInteracti
         .as_ref()
         .expect("Expected user object");
 
+    let table_switch = options
+        .get(1)
+        .expect("Expected user option")
+        .resolved
+        .as_ref()
+        .expect("Expected user object");
+
     let search: i64;
+    let mut num_deleted: i64 = 0;
 
-    if let CommandDataOptionValue::String(value) = name_option {
+    if let CommandDataOptionValue::Integer(choise_id) = table_switch {
+        match choise_id {
+            1 => {
+                if let CommandDataOptionValue::String(value) = name_option {
+                    search = value.parse::<i64>().expect("Not a valid integer");
+                } else {
+                    return format!("{:?} is not a valid string", name_option);
+                }
 
-        search = value.parse::<i64>().expect("Not a valid integer");
-    } else {
-        return format!("{:?} is not a valid string", name_option);
+                (_, num_deleted) = pq::interface::user_delete_row_and_return_val(conn, search);
+            }
+            2 => {
+                if let CommandDataOptionValue::String(value) = name_option {
+                    search = value.parse::<i64>().expect("Not a valid integer");
+                } else {
+                    return format!("{:?} is not a valid string", name_option);
+                }
+
+                (_, num_deleted) = pq::interface::team_delete_row_and_return_val(conn, search);
+            }
+            _ => num_deleted = -1,
+        }
     }
-
-	let (_, num_deleted) = pq::interface::delete_row_and_return_val(conn, search);
 
     format!("Deleted {} row(s)", num_deleted)
 }
 
-pub fn delete_table(_command_interaction: &mut ApplicationCommandInteraction) -> String {
+pub fn delete_table(command_interaction: &mut ApplicationCommandInteraction) -> String {
     let conn = &mut pq::connect::establish_connection();
+    let options = &command_interaction.data.options;
 
-    let _ = pq::interface::delete_table(conn);
+    let table_option = options
+        .get(0)
+        .expect("Expected user option")
+        .resolved
+        .as_ref()
+        .expect("Expected user object");
+
+    if let CommandDataOptionValue::Integer(choise_id) = table_option {
+        match choise_id {
+            1 => {
+                let _ = pq::interface::user_delete_table(conn);
+            }
+			2 => {
+                let _ = pq::interface::team_delete_table(conn);
+            }
+			_ => return format!("Invalid option")
+		}
+    }
 
     format!("Table deleted")
 }
@@ -69,6 +112,13 @@ pub fn register_table_delete(
     command
         .name("delete_table")
         .description("Deletes all rows in a table")
+        .create_option(|option| {
+            option
+                .name("switch")
+                .description("1 for user table, 2 for teams table")
+                .kind(CommandOptionType::Integer)
+                .required(true)
+        })
 }
 
 pub fn register_row_delete_username(
@@ -87,8 +137,8 @@ pub fn register_row_delete_username(
 }
 
 pub fn register_row_delete_id(
-        command: &mut CreateApplicationCommand,
-		) -> &mut CreateApplicationCommand {
+    command: &mut CreateApplicationCommand,
+) -> &mut CreateApplicationCommand {
     command
         .name("delete_row_by_id")
         .description("Delete a row with the specified id")
@@ -97,6 +147,13 @@ pub fn register_row_delete_id(
                 .name("id")
                 .description("Discord user's id")
                 .kind(CommandOptionType::String)
+                .required(true)
+        })
+        .create_option(|option| {
+            option
+                .name("switch")
+                .description("1 for user table, 2 for teams table")
+                .kind(CommandOptionType::Integer)
                 .required(true)
         })
 }

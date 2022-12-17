@@ -1,15 +1,27 @@
+use super::super::super::models::*;
+use super::super::super::schema::teams::dsl::*;
+use super::super::pq;
+use diesel::RunQueryDsl;
 use serenity::builder::CreateApplicationCommand;
 use serenity::model::prelude::command::CommandOptionType;
 use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
 use serenity::model::prelude::interaction::application_command::CommandDataOptionValue;
-use super::super::pq;
 
 pub fn create_team(command_interaction: &mut ApplicationCommandInteraction) -> String {
     let user_parent = command_interaction.member.as_mut().unwrap();
-
+    let connection = &mut pq::connect::establish_connection();
     let options = &command_interaction.data.options;
+    let discord_name = format!(
+        "{}#{}",
+        user_parent.user.name, user_parent.user.discriminator
+    );
+    let id_loc = teams
+        .load::<Teams>(connection)
+        .expect("Error loading")
+        .len() as i64
+        + 1;
 
-    let name_option = options
+    let team_option = options
         .get(0)
         .expect("Expected user option")
         .resolved
@@ -23,34 +35,35 @@ pub fn create_team(command_interaction: &mut ApplicationCommandInteraction) -> S
         .as_ref()
         .expect("Expected user object");
 
-    let connection = &mut pq::connect::establish_connection();
+    let name_loc: &str;
+    let description_loc: &str;
 
-    let id = user_parent.user.id.0 as i64;
-    let discord_name = format!("{}#{}", user_parent.user.name, user_parent.user.discriminator);
-
-    let name: &str;
-    let description: &str;
-
-    if let CommandDataOptionValue::String(value) = name_option {
-        name = value;
+    if let CommandDataOptionValue::String(value) = team_option {
+        name_loc = value;
     } else {
-        return format!("{:?} is not a valid name", name_option);
+        return format!("{:?} is not a valid name", team_option);
     }
 
-	if let CommandDataOptionValue::String(value) = description_option {
-        description = value;
+    if let CommandDataOptionValue::String(value) = description_option {
+        description_loc = value;
     } else {
-        return format!("{:?} is not a valid name", name_option);
+        return format!("{:?} is not a valid description", description_option);
     }
 
-	let _ = pq::interface::insert(connection, &id, name, &discord_name[..], description);
+    let _ = pq::interface::insert_team(
+        connection,
+        &id_loc,
+        name_loc,
+        description_loc,
+        &discord_name[..],
+    );
 
-    format!("You are checked in!")
+    format!("Team created")
 }
 
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
     command
-        .name("checkin")
+        .name("create_team")
         .description("Register as \"Team seeking\". Provide a description of yourself so others can read up on you!")
         .create_option(|option| {
             option
@@ -61,7 +74,7 @@ pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicatio
         })
         .create_option(|option| {
             option
-                    .name("leader")
+                    .name("description")
                     .description("The name of the leader")
                     .kind(CommandOptionType::String)
                     .required(true)

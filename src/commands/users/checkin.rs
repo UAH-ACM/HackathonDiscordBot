@@ -1,8 +1,8 @@
+use super::super::pq;
 use serenity::builder::CreateApplicationCommand;
 use serenity::model::prelude::command::CommandOptionType;
 use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
 use serenity::model::prelude::interaction::application_command::CommandDataOptionValue;
-use super::super::pq;
 
 pub fn checkin(command_interaction: &mut ApplicationCommandInteraction) -> String {
     let user_parent = command_interaction.member.as_mut().unwrap();
@@ -26,10 +26,13 @@ pub fn checkin(command_interaction: &mut ApplicationCommandInteraction) -> Strin
     let connection = &mut pq::connect::establish_connection();
 
     let id = user_parent.user.id.0 as i64;
-	let discord_name = format!("{}#{}", user_parent.user.name, user_parent.user.discriminator);
+    let discord_name = format!(
+        "{}#{}",
+        user_parent.user.name, user_parent.user.discriminator
+    );
 
     let name: &str;
-	let description: &str;
+    let description: &str;
 
     if let CommandDataOptionValue::String(value) = name_option {
         name = value;
@@ -37,13 +40,13 @@ pub fn checkin(command_interaction: &mut ApplicationCommandInteraction) -> Strin
         return format!("{:?} is not a valid name", name_option);
     }
 
-	if let CommandDataOptionValue::String(value) = description_option {
+    if let CommandDataOptionValue::String(value) = description_option {
         description = value;
     } else {
-        return format!("{:?} is not a valid name", name_option);
+        return format!("{:?} is not a valid name", description_option);
     }
 
-	let _ = pq::interface::insert(connection, &id, name, &discord_name[..], description);
+    let _ = pq::interface::insert_user(connection, &id, name, &discord_name[..], description);
 
     format!("You are checked in!")
 }

@@ -2,22 +2,20 @@ use serenity::builder::CreateApplicationCommand;
 use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
 
 use super::super::super::models::*;
-use super::super::super::schema::team_seaking::dsl::*;
+use super::super::super::schema::teams::dsl::*;
 use super::super::pq;
 use diesel::prelude::*;
 
-pub fn get_available_users(_command_interaction: &mut ApplicationCommandInteraction) -> String {
+pub fn get_available_teams(_command_interaction: &mut ApplicationCommandInteraction) -> String {
     let connection = &mut pq::connect::establish_connection();
 
-    let res = team_seaking
-        .load::<TeamSeaking>(connection)
-        .expect("Error loading");
+    let res = teams.load::<Teams>(connection).expect("Error loading");
     let mut return_val = String::new();
 
     for item in res {
         return_val += &format!(
-            "**Name**: {} ({})\n**Description**: {}\n\n",
-            item.name, item.discordname, item.description
+                "**Team Name**: {}\n**Leader**: {}\n**Members**: {}\n**Description**: {}\n\n",
+            item.team_name, item.leader, item.members, item.description
         )
         .to_owned();
     }
@@ -27,6 +25,7 @@ pub fn get_available_users(_command_interaction: &mut ApplicationCommandInteract
 
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
     command
-        .name("list_available_users")
-        .description("Returns the complete list of available users")
+        .name("list_available_teams")
+        .description("Returns the complete list of available teams")
+	
 }

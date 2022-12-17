@@ -7,7 +7,7 @@ use diesel::prelude::*;
 pub struct TeamSeaking {
     pub id: i64,
     pub name: String,
-	pub discordname: String,
+    pub discordname: String,
     pub description: String,
 }
 
@@ -15,9 +15,9 @@ pub struct TeamSeaking {
 #[diesel(table_name = teams)]
 pub struct Teams {
     pub id: i64,
-	pub name: String,
-	pub description: String,
-	pub leader: String,
-	pub members: String,
-	pub points: i64,
+    pub team_name: String,
+    pub description: String,
+    pub leader: String,
+    pub members: String,
+    pub points: i64,
 }

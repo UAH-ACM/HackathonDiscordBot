@@ -1,7 +1,7 @@
 -- Your SQL goes here
 CREATE TABLE teams (
   id bigint PRIMARY KEY,
-  name VARCHAR NOT NULL,
+  team_name VARCHAR NOT NULL,
   description TEXT NOT NULL,
   leader TEXT NOT NULL,
   members TEXT NOT NULL,
