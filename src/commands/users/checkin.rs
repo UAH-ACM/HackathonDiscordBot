@@ -46,9 +46,10 @@ pub fn checkin(command_interaction: &mut ApplicationCommandInteraction) -> Strin
         return format!("{:?} is not a valid name", description_option);
     }
 
-    let _ = pq::interface::insert_user(connection, &id, name, &discord_name[..], description);
-
-    format!("You are checked in!")
+    match pq::interface::insert_user(connection, &id, name, &discord_name[..], description) {
+        Err(bad) => return format!("{}", bad),
+		Ok(_) => return format!("User inserted"),
+    }
 }
 
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {

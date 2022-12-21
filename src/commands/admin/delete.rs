@@ -26,7 +26,12 @@ pub fn delete_record_by_username(
         return format!("{:?} is not a valid id", name_option);
     }
 
-    let num_deleted = pq::interface::user_delete_row(conn, search);
+    let num_deleted;
+
+    match pq::interface::user_delete_row(conn, search) {
+        Ok(good) => num_deleted = good,
+		Err(bad) => return format!("{}", bad),
+    }
 
     format!("Deleted {} row(s)", num_deleted)
 }
@@ -62,7 +67,10 @@ pub fn delete_record_by_id(command_interaction: &mut ApplicationCommandInteracti
                     return format!("{:?} is not a valid string", name_option);
                 }
 
-                (_, num_deleted) = pq::interface::user_delete_row_and_return_val(conn, search);
+                match pq::interface::user_delete_row_and_return_val(conn, search) {
+                    Ok((_, good)) => num_deleted = good,
+					Err(bad) => return format!("{}", bad),
+                }
             }
             2 => {
                 if let CommandDataOptionValue::String(value) = name_option {
@@ -71,7 +79,10 @@ pub fn delete_record_by_id(command_interaction: &mut ApplicationCommandInteracti
                     return format!("{:?} is not a valid string", name_option);
                 }
 
-                (_, num_deleted) = pq::interface::team_delete_row_and_return_val(conn, search);
+				match pq::interface::team_delete_row_and_return_val(conn, search) {
+                    Ok((_, good)) => num_deleted = good,
+					Err(bad) => return format!("{}", bad),
+				}
             }
             _ => num_deleted = -1,
         }

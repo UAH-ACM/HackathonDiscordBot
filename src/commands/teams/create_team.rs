@@ -15,25 +15,17 @@ pub fn create_team(command_interaction: &mut ApplicationCommandInteraction) -> S
         "{}#{}",
         user_parent.user.name, user_parent.user.discriminator
     );
-    let id_loc = teams
-        .load::<Teams>(connection)
-        .expect("Error loading")
-        .len() as i64
-        + 1;
 
-    let team_option = options
-        .get(0)
-        .expect("Expected user option")
-        .resolved
-        .as_ref()
-        .expect("Expected user object");
+    let id_unwrapped = teams.load::<Teams>(connection);
+    let id_loc: i64;
 
-    let description_option = options
-        .get(1)
-        .expect("Expected user option")
-        .resolved
-        .as_ref()
-        .expect("Expected user object");
+    match id_unwrapped {
+        Ok(good) => id_loc = good.len() as i64 + 1,
+		Err(bad) => return format!("{}", bad),
+    }
+
+    let team_option = options.get(0).expect("Expected user option").resolved.as_ref().expect("Expected user object");
+    let description_option = options.get(1).expect("Expected user option").resolved.as_ref().expect("Expected user object");
 
     let name_loc: &str;
     let description_loc: &str;
@@ -50,7 +42,7 @@ pub fn create_team(command_interaction: &mut ApplicationCommandInteraction) -> S
         return format!("{:?} is not a valid description", description_option);
     }
 
-    let _ = pq::interface::insert_team(
+    let res = pq::interface::insert_team(
         connection,
         &id_loc,
         name_loc,
@@ -58,7 +50,10 @@ pub fn create_team(command_interaction: &mut ApplicationCommandInteraction) -> S
         &discord_name[..],
     );
 
-    format!("Team created")
+    match res {
+        Ok(_) => format!("Team created"),
+		Err(e) => format!("{}", e),
+    }
 }
 
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {

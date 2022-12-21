@@ -11,7 +11,7 @@ pub struct TeamSeaking {
     pub description: String,
 }
 
-#[derive(Identifiable, Queryable, Insertable, Eq, PartialEq, Debug)]
+#[derive(Identifiable, Queryable, Insertable, Eq, PartialEq, Debug, AsChangeset)]
 #[diesel(table_name = teams)]
 pub struct Teams {
     pub id: i64,

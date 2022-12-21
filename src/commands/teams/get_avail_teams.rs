@@ -9,13 +9,18 @@ use diesel::prelude::*;
 pub fn get_available_teams(_command_interaction: &mut ApplicationCommandInteraction) -> String {
     let connection = &mut pq::connect::establish_connection();
 
-    let res = teams.load::<Teams>(connection).expect("Error loading");
+    let res: Vec<Teams>;
+
+    match teams.load::<Teams>(connection) {
+        Ok(good) => res = good,
+		Err(bad) => return format!("{}", bad),
+    }
     let mut return_val = String::new();
 
     for item in res {
         return_val += &format!(
-                "**Team Name**: {}\n**Leader**: {}\n**Members**: {}\n**Description**: {}\n\n",
-            item.team_name, item.leader, item.members, item.description
+                "**Team ID**: {}\n**Team Name**: {}\n**Leader**: {}\n**Members**: {}\n\n",
+            item.id, item.team_name, item.leader, item.members
         )
         .to_owned();
     }
@@ -27,5 +32,5 @@ pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicatio
     command
         .name("list_available_teams")
         .description("Returns the complete list of available teams")
-	
+
 }

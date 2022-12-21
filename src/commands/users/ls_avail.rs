@@ -9,9 +9,12 @@ use diesel::prelude::*;
 pub fn get_available_users(_command_interaction: &mut ApplicationCommandInteraction) -> String {
     let connection = &mut pq::connect::establish_connection();
 
-    let res = team_seaking
-        .load::<TeamSeaking>(connection)
-        .expect("Error loading");
+    let res;
+    match team_seaking.load::<TeamSeaking>(connection) {
+        Ok(good) => res = good,
+		Err(bad) => return format!("{}", bad),
+    }
+	
     let mut return_val = String::new();
 
     for item in res {

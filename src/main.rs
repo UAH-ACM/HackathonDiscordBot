@@ -1,3 +1,5 @@
+extern crate diesel;
+
 pub mod commands;
 pub mod models;
 pub mod schema;
@@ -32,6 +34,8 @@ impl EventHandler for Handler {
                 "list_available_teams" => {
                     commands::teams::get_avail_teams::get_available_teams(&mut command)
                 }
+                "join" => commands::teams::join::join(&mut command),
+                "describe" => commands::teams::describe::get_team_descriptions(&mut command),
                 _ => "not implemented :(".to_string(),
             };
 
@@ -110,6 +114,10 @@ impl EventHandler for Handler {
                     .create_application_command(|command| {
                         commands::teams::get_avail_teams::register(command)
                     })
+                    .create_application_command(|command| commands::teams::join::register(command))
+                    .create_application_command(|command| {
+                        commands::teams::describe::register(command)
+                    })
             })
             .await;
 
@@ -143,6 +151,10 @@ impl EventHandler for Handler {
                     })
                     .create_application_command(|command| {
                         commands::teams::get_avail_teams::register(command)
+                    })
+                    .create_application_command(|command| commands::teams::join::register(command))
+                    .create_application_command(|command| {
+                        commands::teams::describe::register(command)
                     })
             })
             .await;

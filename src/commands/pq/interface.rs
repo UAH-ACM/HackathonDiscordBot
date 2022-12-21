@@ -9,7 +9,7 @@ pub fn insert_user(
     name_loc: &str,
     discord_name: &str,
     description_loc: &str,
-) -> TeamSeaking {
+	) -> Result<TeamSeaking, diesel::result::Error> {
     use crate::schema::team_seaking;
 
     let new_seaker = TeamSeaking {
@@ -19,23 +19,18 @@ pub fn insert_user(
         description: String::from(description_loc),
     };
 
-    diesel::insert_into(team_seaking::table)
-        .values(&new_seaker)
-        .get_result(conn)
-        .expect("Error saving new seaker")
+    diesel::insert_into(team_seaking::table).values(&new_seaker).get_result(conn)
 }
 
-pub fn user_delete_row(conn: &mut PgConnection, search: String) -> usize {
-    diesel::delete(team_seaking.filter(discordname.like(search)))
-        .execute(conn)
-        .expect("Error deleting posts")
+pub fn user_delete_row(conn: &mut PgConnection, search: String) -> Result<usize, diesel::result::Error> {
+    diesel::delete(team_seaking.filter(discordname.like(search))).execute(conn)
 }
 
 pub fn user_delete_table(conn: &mut PgConnection) -> Result<usize, diesel::result::Error> {
     diesel::delete(team_seaking).execute(conn)
 }
 
-pub fn user_delete_row_and_return_val(conn: &mut PgConnection, search: i64) -> (TeamSeaking, i64) {
+pub fn user_delete_row_and_return_val(conn: &mut PgConnection, search: i64) -> Result<(TeamSeaking, i64), diesel::result::Error> {
     let mut final_row: TeamSeaking = TeamSeaking {
         id: 0,
         name: String::from(""),
@@ -49,21 +44,31 @@ pub fn user_delete_row_and_return_val(conn: &mut PgConnection, search: i64) -> (
         description: String::from(""),
     };
     let mut amt_deleted: i64 = -1;
+    let res;
 
-    for row in team_seaking
-        .load::<TeamSeaking>(conn)
-        .expect("Could not load table")
-    {
+    match team_seaking.load::<TeamSeaking>(conn) {
+        Err(e) => return Result::Err(e),
+		Ok(good) => res = good,
+	}
+
+	for row in res {
         if row.id == search {
             final_row = row;
         }
     }
 
     if final_row != temp {
-        amt_deleted = user_delete_row(conn, format!("%{}%", final_row.discordname)) as i64;
+        match user_delete_row(conn, format!("%{}%", final_row.discordname)) {
+            Err(_) =>  {
+                amt_deleted = 0;
+            }
+			Ok(good) => {
+                amt_deleted = good as i64;
+            }
+        }
     }
 
-    (final_row, amt_deleted)
+    Result::Ok((final_row, amt_deleted))
 }
 
 // Interface for team
@@ -73,7 +78,7 @@ pub fn insert_team(
     name_loc: &str,
     description_loc: &str,
     leader_loc: &str,
-) -> Teams {
+) -> Result<Teams, diesel::result::Error> {
     use crate::schema::teams;
 
     let new_seaker = Teams {
@@ -85,23 +90,18 @@ pub fn insert_team(
         points: 0,
     };
 
-    diesel::insert_into(teams::table)
-        .values(&new_seaker)
-        .get_result(conn)
-        .expect("Error saving new seaker")
+    diesel::insert_into(teams::table).values(&new_seaker).get_result(conn)
 }
 
-pub fn team_delete_row(conn: &mut PgConnection, search: String) -> usize {
-    diesel::delete(teams.filter(team_name.like(search)))
-        .execute(conn)
-        .expect("Error deleting posts")
+pub fn team_delete_row(conn: &mut PgConnection, search: String) -> Result<usize, diesel::result::Error> {
+    diesel::delete(teams.filter(team_name.like(search))).execute(conn)
 }
 
 pub fn team_delete_table(conn: &mut PgConnection) -> Result<usize, diesel::result::Error> {
     diesel::delete(teams).execute(conn)
 }
 
-pub fn team_delete_row_and_return_val(conn: &mut PgConnection, search: i64) -> (Teams, i64) {
+pub fn team_delete_row_and_return_val(conn: &mut PgConnection, search: i64) -> Result<(Teams, i64), diesel::result::Error> {
     let mut final_row = Teams {
         id: 0,
         team_name: String::from(""),
@@ -120,15 +120,29 @@ pub fn team_delete_row_and_return_val(conn: &mut PgConnection, search: i64) -> (
     };
     let mut amt_deleted: i64 = -1;
 
-    for row in teams.load::<Teams>(conn).expect("Could not load table") {
+    let res: Vec<Teams>;
+
+    match teams.load::<Teams>(conn) {
+        Err(e) => return Result::Err(e),
+		Ok(good) => res = good,
+    }
+
+    for row in res {
         if row.id == search {
             final_row = row;
         }
     }
 
-    if final_row != temp {
-        amt_deleted = team_delete_row(conn, format!("%{}%", final_row.team_name)) as i64;
+	if final_row != temp {
+        match team_delete_row(conn, format!("%{}%", final_row.team_name)) {
+            Err(_) =>  {
+                amt_deleted = 0;
+            }
+			Ok(good) => {
+                amt_deleted = good as i64;
+            }
+        }
     }
 
-    (final_row, amt_deleted)
+	Result::Ok((final_row, amt_deleted))
 }
