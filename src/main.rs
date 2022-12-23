@@ -26,7 +26,7 @@ impl EventHandler for Handler {
                 "delete_row_by_id" => commands::admin::delete::delete_record_by_id(&mut command),
                 "delete_row_by_username" => commands::admin::delete::delete_record_by_username(&mut command),
                 "list_available_users" => commands::users::ls_avail::get_available_users(&mut command),
-                "create_team" => commands::teams::create_team::create_team(&mut command),
+                "create_team" => commands::teams::create_team::create_team(&ctx, &mut command).await,
                 "list_available_teams" => commands::teams::get_avail_teams::get_available_teams(&mut command),
                 "join" => commands::teams::join::join(&mut command),
                 "describe" => commands::teams::describe::get_team_descriptions(&mut command),

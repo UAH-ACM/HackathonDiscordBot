@@ -1,4 +1,5 @@
 use serenity::builder::CreateApplicationCommand;
+use serenity::model::prelude::command::CommandOptionType;
 
 pub fn help() -> String {
 	let part1 = "**The following is a list of available commands.**";
@@ -16,4 +17,11 @@ pub fn help() -> String {
 
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
     command.name("help").description("Show the help message.")
+		.create_option(|option| {
+            option
+				.name("type")
+				.description("Help menu for certain category of commands")
+				.kind(CommandOptionType::String)
+				.required(true)
+        })
 }

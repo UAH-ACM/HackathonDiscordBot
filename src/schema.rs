@@ -17,7 +17,11 @@ diesel::table! {
         leader -> Text,
         members -> Text,
         points -> Int8,
+        role_id -> Int8,
     }
 }
 
-diesel::allow_tables_to_appear_in_same_query!(team_seaking, teams);
+diesel::allow_tables_to_appear_in_same_query!(
+    team_seaking,
+    teams,
+);

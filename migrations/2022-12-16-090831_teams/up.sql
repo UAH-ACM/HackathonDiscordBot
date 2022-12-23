@@ -5,5 +5,6 @@ CREATE TABLE teams (
   description TEXT NOT NULL,
   leader TEXT NOT NULL,
   members TEXT NOT NULL,
-  points bigint NOT NULL
+  points bigint NOT NULL,
+  role_id bigint NOT NULL
 );

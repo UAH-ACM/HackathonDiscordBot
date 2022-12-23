@@ -78,6 +78,7 @@ pub fn insert_team(
     name_loc: &str,
     description_loc: &str,
     leader_loc: &str,
+	role: &i64,
 ) -> Result<Teams, diesel::result::Error> {
     use crate::schema::teams;
 
@@ -88,6 +89,7 @@ pub fn insert_team(
         leader: String::from(leader_loc),
         members: String::from(""),
         points: 0,
+		role_id: *role,
     };
 
     diesel::insert_into(teams::table).values(&new_seaker).get_result(conn)
@@ -109,6 +111,7 @@ pub fn team_delete_row_and_return_val(conn: &mut PgConnection, search: i64) -> R
         leader: String::from(""),
         members: String::from(""),
         points: 0,
+		role_id: 0,
     };
     let temp = Teams {
         id: 0,
@@ -117,6 +120,7 @@ pub fn team_delete_row_and_return_val(conn: &mut PgConnection, search: i64) -> R
         leader: String::from(""),
         members: String::from(""),
         points: 0,
+		role_id: 0,
     };
     let mut amt_deleted: i64 = -1;
 

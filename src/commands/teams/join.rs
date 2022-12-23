@@ -9,6 +9,7 @@ use super::super::pq;
 use diesel::prelude::*;
 use diesel::query_dsl::QueryDsl;
 
+// TODO: Give user role from role id stored in the db
 pub fn join(command_interaction: &mut ApplicationCommandInteraction) -> String {
     let connection = &mut pq::connect::establish_connection();
     let user_parent = command_interaction.member.as_mut().unwrap();
