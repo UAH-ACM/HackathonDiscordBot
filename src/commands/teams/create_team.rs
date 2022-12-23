@@ -6,11 +6,16 @@ use serenity::builder::CreateApplicationCommand;
 use serenity::model::prelude::command::CommandOptionType;
 use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
 use serenity::model::prelude::interaction::application_command::CommandDataOptionValue;
+use serenity::model::channel::*;
+use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
+use serenity::model::permissions::Permissions;
 use serenity::prelude::*;
 
 
 // TODO: Create a ChannelCategory with 3 Channels: general, git, voice
 pub async fn create_team(ctx: &Context, command_interaction: &mut ApplicationCommandInteraction) -> String {
+    let mut result = String::new();
+
     let user_parent = command_interaction.member.as_mut().unwrap();
     let connection = &mut pq::connect::establish_connection();
     let options = &command_interaction.data.options;
@@ -29,7 +34,7 @@ pub async fn create_team(ctx: &Context, command_interaction: &mut ApplicationCom
 
 	for item in id_unwrapped.unwrap() {
         if item.leader == discord_name {
-            return String::from("You cannot be a member of a team you are a leader of");
+            return String::from("You cannot create another team");
         }
     }
 
@@ -59,8 +64,8 @@ pub async fn create_team(ctx: &Context, command_interaction: &mut ApplicationCom
         return format!("{:?} is not a valid color", team_option);
     }
 
-	let guild_id = command_interaction.guild_id.unwrap();
-    let role = guild_id.create_role(&ctx, |role| {
+	let guild_id_loc = command_interaction.guild_id.unwrap();
+    let role = guild_id_loc.create_role(&ctx, |role| {
         role.name(format!("{}", name_loc))
 			.colour(role_color)
 			.mentionable(true)
@@ -77,18 +82,93 @@ pub async fn create_team(ctx: &Context, command_interaction: &mut ApplicationCom
 		&(new_role_id.0 as i64)
     );
 
-    let user_id = command_interaction.user.id;
-
-    let mut member = guild_id.member(&ctx, user_id).await.unwrap();
-    match member.add_role(&ctx, new_role_id).await {
-        Err(e) => format!("{}", e),
-		Ok(good) => {
-            match res {
-                Ok(_) => format!("Team created with role {:?}", good),
-				Err(e) => format!("{}", e),
-			}
+    match res {
+        Err(e) => {
+            result = format!("{}{}", result, e);
+        },
+		Ok(_) => {
+            result = format!("{}{}", result, "Team created\n");
         }
     }
+
+    let user_id = command_interaction.user.id;
+
+    let mut member = guild_id_loc.member(&ctx, user_id).await.unwrap();
+    let role_success = member.add_role(&ctx, new_role_id).await;
+
+    match role_success {
+        Err(e) => {
+            result = format!("{}{}", result, e);
+        },
+		Ok(_) => {
+            result = format!("{}{}", result, "Role created and assgined!\n");
+        }
+    }
+
+	let everyone_id = guild_id_loc.roles(&ctx).await.ok().unwrap();
+    let mut everyone: serenity::model::id::RoleId = serenity::model::id::RoleId(0);
+    for (_, item) in everyone_id {
+        if item.name == "@everyone" {
+			everyone = item.id;
+        }
+    }
+
+
+	let permissions = vec![ PermissionOverwrite {
+        allow: Permissions::ADD_REACTIONS | Permissions::VIEW_CHANNEL | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS | Permissions::ATTACH_FILES | Permissions::READ_MESSAGE_HISTORY | Permissions::USE_EXTERNAL_EMOJIS | Permissions::CONNECT | Permissions::SPEAK | Permissions::USE_VAD | Permissions::CHANGE_NICKNAME | Permissions::USE_SLASH_COMMANDS | Permissions::REQUEST_TO_SPEAK | Permissions::CREATE_PUBLIC_THREADS | Permissions::CREATE_PRIVATE_THREADS | Permissions::USE_EXTERNAL_STICKERS | Permissions::SEND_MESSAGES_IN_THREADS | Permissions::USE_EMBEDDED_ACTIVITIES,
+		deny: Permissions::empty(),
+		kind: PermissionOverwriteType::Role(new_role_id),
+	},
+	PermissionOverwrite {
+        allow: Permissions::empty(),
+		deny: Permissions::VIEW_CHANNEL,
+		kind: PermissionOverwriteType::Role(everyone)
+    }];
+
+
+	let channel_category = guild_id_loc.create_channel(&ctx, |channel_category| {
+        channel_category
+			.name(name_loc)
+			.nsfw(false)
+			.kind(ChannelType::Category)
+			.permissions::<Vec<PermissionOverwrite>>(permissions.clone())
+    }).await.unwrap();
+
+    let mut general_channel = guild_id_loc.create_channel(&ctx, |channel_category| {
+        channel_category
+			.name("general")
+			.nsfw(false)
+			.kind(ChannelType::Text)
+			.permissions::<Vec<PermissionOverwrite>>(permissions.clone())
+    }).await.unwrap();
+
+    let mut git_channel = guild_id_loc.create_channel(&ctx, |channel_category| {
+        channel_category
+			.name("git")
+			.nsfw(false)
+			.kind(ChannelType::Text)
+			.permissions::<Vec<PermissionOverwrite>>(permissions.clone())
+    }).await.unwrap();
+
+    let mut voice_channel = guild_id_loc.create_channel(&ctx, |channel_category| {
+        channel_category
+			.name("voice")
+			.nsfw(false)
+			.kind(ChannelType::Voice)
+			.permissions::<Vec<PermissionOverwrite>>(permissions.clone())
+    }).await.unwrap();
+
+	general_channel.edit(&ctx, |channel| {
+        channel.category(channel_category.id)
+    }).await.ok();
+    git_channel.edit(&ctx, |channel| {
+        channel.category(channel_category.id)
+    }).await.ok();
+    voice_channel.edit(&ctx, |channel| {
+        channel.category(channel_category.id)
+    }).await.ok();
+
+	String::from(result)
 }
 
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
