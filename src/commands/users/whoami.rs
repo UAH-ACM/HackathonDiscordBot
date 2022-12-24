@@ -1,5 +1,5 @@
-use serenity::builder::CreateApplicationCommand;
 use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
+use serenity::builder::CreateApplicationCommand;
 
 pub fn whoami(command_interaction: &mut ApplicationCommandInteraction) -> String {
     let user_parent = command_interaction.member.as_mut().unwrap();

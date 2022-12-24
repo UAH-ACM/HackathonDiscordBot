@@ -1,12 +1,16 @@
-use serenity::builder::CreateApplicationCommand;
-use serenity::model::prelude::command::CommandOptionType;
-use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
-use serenity::model::prelude::interaction::application_command::CommandDataOptionValue;
+use serenity::{
+    builder::CreateApplicationCommand,
+	model::prelude::{
+        command::CommandOptionType,
+		interaction::application_command::{ ApplicationCommandInteraction, CommandDataOptionValue }
+    }
+};
 
-use super::super::super::models::*;
-use super::super::super::schema::team_seaking::dsl::*;
-use super::super::super::schema::teams::dsl::*;
-use super::super::pq;
+use super::super::{
+    pq,
+	super::{ models::*, schema::{ team_seaking::dsl::*, teams::dsl::* } }
+};
+
 use diesel::prelude::*;
 
 pub fn get_table(command_interaction: &mut ApplicationCommandInteraction) -> String {

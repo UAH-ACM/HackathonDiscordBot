@@ -1,7 +1,6 @@
 use super::super::super::schema::{team_seaking::dsl::*, teams::dsl::*};
-use diesel::prelude::*;
-
 use super::super::super::models::{TeamSeaking, Teams};
+use diesel::prelude::*;
 
 pub fn insert_user(
     conn: &mut PgConnection,

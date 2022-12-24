@@ -1,16 +1,22 @@
-use super::super::super::models::*;
-use super::super::super::schema::teams::dsl::*;
-use super::super::pq;
-use diesel::RunQueryDsl;
 use serenity::builder::CreateApplicationCommand;
-use serenity::model::prelude::command::CommandOptionType;
-use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
-use serenity::model::prelude::interaction::application_command::CommandDataOptionValue;
-use serenity::model::channel::*;
-use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
-use serenity::model::permissions::Permissions;
 use serenity::prelude::*;
+use diesel::RunQueryDsl;
+use super::super::pq;
 
+use super::super::super::{
+    models::*,
+	schema::teams::dsl::*
+};
+
+use serenity::model::{
+    prelude::{
+        command::CommandOptionType,
+		interaction::application_command::ApplicationCommandInteraction,
+		interaction::application_command::CommandDataOptionValue
+    },
+	channel::*,
+	permissions::Permissions
+};
 
 // TODO: Create a ChannelCategory with 3 Channels: general, git, voice
 pub async fn create_team(ctx: &Context, command_interaction: &mut ApplicationCommandInteraction) -> String {

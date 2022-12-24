@@ -1,8 +1,10 @@
-use super::super::pq;
 use serenity::builder::CreateApplicationCommand;
-use serenity::model::prelude::command::CommandOptionType;
-use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
-use serenity::model::prelude::interaction::application_command::CommandDataOptionValue;
+use super::super::pq;
+
+use serenity::model::prelude::{
+    command::CommandOptionType,
+	interaction::application_command::{ ApplicationCommandInteraction, CommandDataOptionValue }
+};
 
 pub fn checkin(command_interaction: &mut ApplicationCommandInteraction) -> String {
     let user_parent = command_interaction.member.as_mut().unwrap();

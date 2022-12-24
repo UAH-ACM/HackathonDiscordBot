@@ -1,12 +1,18 @@
 use serenity::builder::CreateApplicationCommand;
-use serenity::model::prelude::command::CommandOptionType;
-use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
-use serenity::model::prelude::interaction::application_command::CommandDataOptionValue;
-
-use super::super::super::models::*;
-use super::super::super::schema::teams::dsl::*;
 use super::super::pq;
 use diesel::prelude::*;
+
+use serenity::model::prelude::{
+	command::CommandOptionType,
+	interaction::application_command::ApplicationCommandInteraction,
+	interaction::application_command::CommandDataOptionValue
+};
+
+use super::super::super::{
+    models::*,
+	schema::teams::dsl::*
+};
+
 
 pub fn get_team_descriptions(command_interaction: &mut ApplicationCommandInteraction) -> String {
     let connection = &mut pq::connect::establish_connection();

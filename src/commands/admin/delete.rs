@@ -1,8 +1,12 @@
 use super::super::pq;
-use serenity::builder::CreateApplicationCommand;
-use serenity::model::prelude::command::CommandOptionType;
-use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
-use serenity::model::prelude::interaction::application_command::CommandDataOptionValue;
+
+use serenity::{
+    builder::CreateApplicationCommand,
+	model::prelude::{
+        command::CommandOptionType,
+		interaction::application_command::{ApplicationCommandInteraction, CommandDataOptionValue}
+    }
+};
 
 pub fn delete_record_by_username(
     command_interaction: &mut ApplicationCommandInteraction,

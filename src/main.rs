@@ -5,11 +5,16 @@ pub mod models;
 pub mod schema;
 
 use dotenv::dotenv;
-use serenity::async_trait;
-use serenity::model::application::interaction::{Interaction, InteractionResponseType};
-use serenity::model::gateway::Ready;
-use serenity::model::id::GuildId;
-use serenity::prelude::*;
+
+use serenity::{
+    async_trait,
+	prelude::*,
+	model::{
+        application::interaction::{Interaction, InteractionResponseType},
+		gateway::Ready,
+		id::GuildId
+    }
+};
 
 struct Handler;
 
@@ -28,9 +33,9 @@ impl EventHandler for Handler {
                 "list_available_users" => commands::users::ls_avail::get_available_users(&mut command),
                 "create_team" => commands::teams::create_team::create_team(&ctx, &mut command).await,
                 "list_available_teams" => commands::teams::get_avail_teams::get_available_teams(&mut command),
-                "join" => commands::teams::join::join(&mut command),
+                "join" => commands::teams::join::join(&ctx, &mut command).await,
                 "describe" => commands::teams::describe::get_team_descriptions(&mut command),
-                _ => "not implemented :(".to_string(),
+                _ => "not implemented".to_string(),
             };
 
             if content.len() > 2000 {

@@ -1,10 +1,12 @@
-use serenity::builder::CreateApplicationCommand;
 use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
-
-use super::super::super::models::*;
-use super::super::super::schema::teams::dsl::*;
-use super::super::pq;
+use serenity::builder::CreateApplicationCommand;
 use diesel::prelude::*;
+use super::super::pq;
+
+use super::super::super::{
+    models::*,
+	schema::teams::dsl::*
+};
 
 pub fn get_available_teams(_command_interaction: &mut ApplicationCommandInteraction) -> String {
     let connection = &mut pq::connect::establish_connection();

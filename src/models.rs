@@ -1,5 +1,4 @@
-use crate::schema::team_seaking;
-use crate::schema::teams;
+use crate::schema::{team_seaking, teams};
 use diesel::prelude::*;
 
 #[derive(Identifiable, Queryable, Insertable, Eq, PartialEq, Debug)]

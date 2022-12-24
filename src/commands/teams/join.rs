@@ -1,16 +1,24 @@
 use serenity::builder::CreateApplicationCommand;
-use serenity::model::prelude::command::CommandOptionType;
-use serenity::model::prelude::interaction::application_command::ApplicationCommandInteraction;
-use serenity::model::prelude::interaction::application_command::CommandDataOptionValue;
-
-use super::super::super::models::Teams;
-use super::super::super::schema::teams::dsl::*;
+use serenity::prelude::*;
 use super::super::pq;
-use diesel::prelude::*;
-use diesel::query_dsl::QueryDsl;
+
+use super::super::super::{
+    models::Teams,
+	schema::teams::dsl::*
+};
+
+use diesel::{
+    prelude::*,
+	query_dsl::QueryDsl
+};
+
+use serenity::model::prelude::{
+    command::CommandOptionType,
+	interaction::application_command::{ ApplicationCommandInteraction, CommandDataOptionValue }
+};
 
 // TODO: Give user role from role id stored in the db
-pub fn join(command_interaction: &mut ApplicationCommandInteraction) -> String {
+pub async fn join(ctx: &Context, command_interaction: &mut ApplicationCommandInteraction) -> String {
     let connection = &mut pq::connect::establish_connection();
     let user_parent = command_interaction.member.as_mut().unwrap();
     let options = &command_interaction.data.options;
@@ -28,7 +36,7 @@ pub fn join(command_interaction: &mut ApplicationCommandInteraction) -> String {
     if let CommandDataOptionValue::Integer(value) = id_loc_option {
         id_loc = * value;
     } else {
-        return format!("{:?} is not a valid name", id_loc_option);
+        return format!("{:?} is not a valid team ID", id_loc_option);
     }
 
 	let binding;
@@ -57,9 +65,6 @@ pub fn join(command_interaction: &mut ApplicationCommandInteraction) -> String {
     }
 
     for item in res {
-        if item.id == id_loc {
-            continue;
-        }
         if item.leader == discord_name {
             return String::from("You cannot be a member of a team you are a leader of");
         }
@@ -72,9 +77,16 @@ pub fn join(command_interaction: &mut ApplicationCommandInteraction) -> String {
 
 	let new_members_list = result.members.to_owned() + &String::from(format!("{}, ", discord_name)).to_owned();
 
+    let guild_id_loc = command_interaction.guild_id.unwrap();
+    let role_id_loc = serenity::model::id::RoleId(result.role_id as u64);
+    let user_id = command_interaction.user.id;
+
+    let mut member = guild_id_loc.member(&ctx, user_id).await.unwrap();
+    let role_success = member.add_role(&ctx, role_id_loc).await;
+
     let update_result = diesel::update(teams).set(members.eq(new_members_list)).execute(connection);
 
-    format!("{:?}\n", update_result)
+    format!("{:?}{:?}\n", update_result, role_success)
 }
 
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
