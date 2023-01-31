@@ -26,6 +26,11 @@ pub fn get_available_users(_command_interaction: &mut ApplicationCommandInteract
         )
         .to_owned();
     }
+	
+	if return_val == "" {
+		return_val = String::from("No users to display");
+	}
+	
 
     format!("{}\n", return_val)
 }

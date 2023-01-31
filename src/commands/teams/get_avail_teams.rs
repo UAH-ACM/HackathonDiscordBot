@@ -26,6 +26,10 @@ pub fn get_available_teams(_command_interaction: &mut ApplicationCommandInteract
         )
         .to_owned();
     }
+	
+	if return_val == "" {
+		return_val = String::from("No teams to display");
+	}
 
     format!("{}\n", return_val)
 }
