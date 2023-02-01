@@ -92,7 +92,7 @@ pub async fn join(ctx: &Context, command_interaction: &mut ApplicationCommandInt
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
     command
         .name("join")
-        .description("Returns the complete list of available teams")
+        .description("Allows you to join a team (Ask the leader if you can join first)")
 		.create_option(|option| {
             option
                     .name("id")

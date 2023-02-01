@@ -48,7 +48,7 @@ pub fn get_team_descriptions(command_interaction: &mut ApplicationCommandInterac
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
     command
         .name("describe")
-        .description("Returns the complete list of available teams")
+        .description("Will show you the desciotion of a particular team")
 		.create_option(|option| {
             option
                     .name("id")

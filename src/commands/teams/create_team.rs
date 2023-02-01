@@ -180,7 +180,7 @@ pub async fn create_team(ctx: &Context, command_interaction: &mut ApplicationCom
 pub fn register(command: &mut CreateApplicationCommand) -> &mut CreateApplicationCommand {
     command
         .name("create_team")
-        .description("Register as \"Team seeking\". Provide a description of yourself so others can read up on you!")
+        .description("Create a team so others can jon you")
         .create_option(|option| {
             option
                     .name("team")
