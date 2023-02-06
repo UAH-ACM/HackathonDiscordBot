@@ -1,4 +1,3 @@
-use serenity::model::prelude::command::CommandOptionType;
 use serenity::builder::CreateApplicationCommand;
 
 pub fn help() -> String {
