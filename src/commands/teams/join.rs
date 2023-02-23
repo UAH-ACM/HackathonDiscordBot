@@ -84,7 +84,9 @@ pub async fn join(ctx: &Context, command_interaction: &mut ApplicationCommandInt
     let mut member = guild_id_loc.member(&ctx, user_id).await.unwrap();
     let role_success = member.add_role(&ctx, role_id_loc).await;
 
-    let update_result = diesel::update(teams).set(members.eq(new_members_list)).execute(connection);
+	// let members_list, a = diesel::update(teams.select(id_loc_option)).set(members.)
+
+	let update_result = diesel::update(result).set(members.eq(new_members_list)).execute(connection);
 
     format!("{:?}{:?}\n", update_result, role_success)
 }
